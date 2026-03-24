@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from geopy.geocoders import Nominatim
+from PIL import Image
 
 # 1. CONFIGURACIÓN Y ESTILOS
 st.set_page_config(page_title="Buscador Carreteras CV", page_icon="🚔", layout="centered")
@@ -19,20 +20,34 @@ st.markdown("""
         justify-content: center !important;
         margin-top: 10px !important;
     }
-    .firma {
-        text-align: center;
-        font-weight: bold;
-        color: #1E88E5;
+    .seccion-final {
+        background-color: #004d00; /* Verde Oliva Guardia Civil */
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
         margin-top: 30px;
-        font-size: 1.1rem;
+        text-align: center;
+    }
+    .firma-contenedor {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+    .firma-texto {
+        font-weight: bold;
+        font-size: 1.3rem;
+    }
+    .escudo {
+        width: 50px;
+        height: auto;
     }
     .privacidad {
         font-size: 0.8rem;
-        color: #666;
-        text-align: center;
-        margin-top: 10px;
-        padding: 10px;
-        border-top: 1px solid #eee;
+        color: #ddd;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -93,13 +108,29 @@ if via_input:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- FIRMA Y LEYENDA DE PRIVACIDAD ---
-st.markdown(f"""
-    <div class="firma">
-        ✍️ Gómez Dest B
-    </div>
+# --- SECCIÓN FINAL CON FIRMA Y PRIVACIDAD ---
+st.markdown('<div class="seccion-final">', unsafe_allow_html=True)
+
+# Intentar cargar escudos
+gc_escudo_path = os.path.join('assets', 'escudo_gc.png')
+trafico_escudo_path = os.path.join('assets', 'escudo_trafico.png')
+
+col_firma1, col_firma2, col_firma3 = st.columns([1, 2, 1])
+
+with col_firma1:
+    if os.path.exists(gc_escudo_path):
+        st.image(gc_escudo_path, width=50)
+with col_firma2:
+    st.markdown('<div class="firma-texto">✍️ Gómez Dest B</div>', unsafe_allow_html=True)
+with col_firma3:
+    if os.path.exists(trafico_escudo_path):
+        st.image(trafico_escudo_path, width=50)
+
+st.markdown("""
     <div class="privacidad">
         🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni 
-        información técnica del usuario. Las estadísticas son anónimas.
+        información técnica del usuario.
     </div>
 """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
