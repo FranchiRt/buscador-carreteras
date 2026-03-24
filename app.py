@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from geopy.geocoders import Nominatim
 
-# 1. CONFIGURACIÓN Y ESTILOS (Sin fondos, solo ajustes de ancho)
+# 1. CONFIGURACIÓN Y ESTILOS
 st.set_page_config(page_title="Buscador Carreteras CV", page_icon="🚔", layout="centered")
 
 st.markdown("""
@@ -33,6 +33,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- CABECERA CON ESCUDO (Arriba a la derecha) ---
+col_t, col_e = st.columns([4, 1])
+with col_t:
+    st.title("Buscador Carreteras CV")
+with col_e:
+    if os.path.exists("assets/escudo.png"):
+        st.image("assets/escudo.png", width=80)
+    else:
+        st.write("🚔")
+
 # 2. FUNCIONES
 @st.cache_data
 def load_data():
@@ -42,7 +52,7 @@ def load_data():
         return df
     except: return pd.DataFrame()
 
-# 3. LÓGICA PRINCIPAL
+# 3. LÓGICA PRINCIPAL (Intacta: Origen, Destino y Longitud)
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
@@ -76,6 +86,7 @@ if via_input:
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
             
+            # SE MANTIENE EL TRAMO COMPLETO
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (Longitud: {longitud_total} KM)")
             
         except:
@@ -89,7 +100,7 @@ if via_input:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- SECCIÓN FINAL: PRIVACIDAD + TU FIRMA ---
+# --- SECCIÓN FINAL: PRIVACIDAD + FIRMA ---
 st.markdown("""
     <div class="seccion-final">
         <div class="privacidad-firma">
