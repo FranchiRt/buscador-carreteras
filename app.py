@@ -3,49 +3,58 @@ import pandas as pd
 import os
 from geopy.geocoders import Nominatim
 
-# 1. CONFIGURACIÓN Y ESTILOS (Aquí he añadido el fondo)
+# 1. CONFIGURACIÓN Y ESTILOS (Optimizado para Móvil)
 st.set_page_config(page_title="Buscador Carreteras CV", page_icon="🚔", layout="centered")
 
 st.markdown("""
     <style>
-    /* Fondo de la aplicación */
+    /* Fondo general gris azulado */
     .stApp {
         background-color: #f0f2f6;
     }
     
-    /* Contenedor principal de los inputs */
+    /* Contenedor tipo 'Tarjeta' para que en el móvil se vea ordenado */
+    .stDeployButton {display:none;}
+    footer {visibility: hidden;}
+    
+    /* Ajuste de inputs para que no se peguen a los bordes */
     div[data-testid="stNumberInput"], div[data-testid="stTextInput"], div[data-testid="stSelectbox"] {
         width: 100% !important;
+        padding: 5px 0px;
     }
     
-    /* Estilo del botón del mapa */
+    /* Botón del mapa bien grande para el dedo en el móvil */
     a[data-testid="stLinkButton"] {
         width: 100% !important;
-        height: 50px !important;
+        height: 60px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        margin-top: 10px !important;
+        margin-top: 15px !important;
         background-color: #1E88E5 !important;
         color: white !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
     }
 
     .seccion-final {
         text-align: center;
-        margin-top: 50px;
+        margin-top: 40px;
         padding: 20px;
-        border-top: 1px solid #ccc;
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #ddd;
     }
 
     .privacidad-firma {
         font-size: 0.85rem;
-        color: #444;
-        line-height: 1.6;
+        color: #333;
+        line-height: 1.5;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. FUNCIONES
+# 2. FUNCIONES (Intactas)
 @st.cache_data
 def load_data():
     try:
@@ -54,7 +63,7 @@ def load_data():
         return df
     except: return pd.DataFrame()
 
-# 3. LÓGICA PRINCIPAL
+# 3. LÓGICA PRINCIPAL (Intacta)
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
@@ -106,7 +115,7 @@ st.markdown("""
     <div class="seccion-final">
         <div class="privacidad-firma">
             🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni información técnica del usuario. 
-            <br><b>✍️ Gómez Dest B</b>
+            <br><br><b>✍️ Gómez Dest B</b>
         </div>
     </div>
 """, unsafe_allow_html=True)
