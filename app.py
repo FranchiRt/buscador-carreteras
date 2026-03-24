@@ -87,7 +87,6 @@ if via_input:
     
     if not puntos.empty:
         pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
-        # Calculamos la longitud total restando el final menos el inicial
         longitud_total = round(pk_max - pk_min, 1)
         
         try:
@@ -104,8 +103,7 @@ if via_input:
         except:
             st.info(f"🚩 **RANGO:** {via_input} ({longitud_total} KM totales)")
 
-        # --- FRASE CON EL RANGO PARA ELEGIR ---
-        st.write(f"**Estos son los km que tiene la carretera para elegir: desde el {pk_min} al {pk_max}**")
+        # --- LÍNEA DE RANGO ELIMINADA COMO PEDISTE ---
         
         pk_val = st.number_input("📍 PK A BUSCAR:", min_value=float(pk_min), max_value=float(pk_max), step=0.1, value=float(pk_min))
         
