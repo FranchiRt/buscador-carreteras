@@ -22,23 +22,26 @@ st.markdown("""
     .seccion-final {
         margin-top: 50px;
         padding: 20px;
-        border-top: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        gap: 20px;
+        border-top: 1px solid #444;
     }
     .privacidad-firma {
-        font-size: 0.85rem;
-        color: #666;
-        line-height: 1.6;
+        font-size: 1rem;
+        color: #ffffff; /* BLANCO PURO para que se vea en pantallas oscuras */
+        line-height: 1.5;
+        text-shadow: 1px 1px 2px #000000; /* Sombra para que se lea en cualquier fondo */
+    }
+    .firma-destacada {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA (SOLO CARRETERAS) ---
+# --- CABECERA ---
 st.title("🛣️ CARRETERAS")
 
-# 2. FUNCIONES
+# 2. FUNCIONES (Intactas)
 @st.cache_data
 def load_data():
     try:
@@ -94,12 +97,13 @@ if via_input:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- SECCIÓN FINAL: ESCUDO ABAJO A LA IZQUIERDA + PRIVACIDAD + FIRMA ---
-col_escudo, col_texto = st.columns([1, 4])
+# --- SECCIÓN FINAL: BLANCO SOBRE NEGRO ---
+st.markdown('<div class="seccion-final">', unsafe_allow_html=True)
+col_escudo, col_texto = st.columns([1, 5])
 
 with col_escudo:
     if os.path.exists("assets/escudo.png"):
-        st.image("assets/escudo.png", width=60)
+        st.image("assets/escudo.png", width=65)
     else:
         st.write("🚔")
 
@@ -107,6 +111,7 @@ with col_texto:
     st.markdown("""
         <div class="privacidad-firma">
             🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni información técnica del usuario. 
-            <br><b>✍️ Gómez Dest B</b>
+            <br><span class="firma-destacada">✍️ Gómez Dest B</span>
         </div>
     """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
