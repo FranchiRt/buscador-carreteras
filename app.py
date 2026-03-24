@@ -20,37 +20,23 @@ st.markdown("""
         margin-top: 10px !important;
     }
     .seccion-final {
-        text-align: center;
         margin-top: 50px;
         padding: 20px;
         border-top: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 20px;
     }
     .privacidad-firma {
         font-size: 0.85rem;
         color: #666;
         line-height: 1.6;
     }
-    /* Estilo para el subtitulo */
-    .subtitulo-cv {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #555;
-        margin-top: -20px;
-        margin-bottom: 10px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA (CARRETERAS + COM VALENCIANA + ESCUDO) ---
-col_t, col_e = st.columns([5, 1]) 
-with col_t:
-    st.title("🛣️ CARRETERAS")
-    st.markdown('<p class="subtitulo-cv">COM VALENCIANA</p>', unsafe_allow_html=True)
-with col_e:
-    if os.path.exists("assets/escudo.png"):
-        st.image("assets/escudo.png", width=50)
-    else:
-        st.write("🚔")
+# --- CABECERA (SOLO CARRETERAS) ---
+st.title("🛣️ CARRETERAS")
 
 # 2. FUNCIONES
 @st.cache_data
@@ -61,7 +47,7 @@ def load_data():
         return df
     except: return pd.DataFrame()
 
-# 3. LÓGICA PRINCIPAL
+# 3. LÓGICA PRINCIPAL (Intacta)
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
@@ -108,12 +94,19 @@ if via_input:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- SECCIÓN FINAL: PRIVACIDAD + FIRMA ---
-st.markdown("""
-    <div class="seccion-final">
+# --- SECCIÓN FINAL: ESCUDO ABAJO A LA IZQUIERDA + PRIVACIDAD + FIRMA ---
+col_escudo, col_texto = st.columns([1, 4])
+
+with col_escudo:
+    if os.path.exists("assets/escudo.png"):
+        st.image("assets/escudo.png", width=60)
+    else:
+        st.write("🚔")
+
+with col_texto:
+    st.markdown("""
         <div class="privacidad-firma">
             🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni información técnica del usuario. 
             <br><b>✍️ Gómez Dest B</b>
         </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
