@@ -88,21 +88,9 @@ if via_input:
     if not puntos.empty:
         pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
         
-        try:
-            li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}", timeout=3)
-            lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}", timeout=3)
-            def obtener_ref(loc):
-                if not loc: return "N/A"
-                d = loc.raw.get('address', {})
-                return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
-            
-            # Muestra el tramo con el nombre de los pueblos y el rango de KM
-            st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (KM {pk_min}-{pk_max})")
-            
-        except:
-            st.info(f"🚩 **RANGO:** {via_input} (KM {pk_min} a {pk_max})")
+        # --- CAMBIO 1: SOLO LONGITUD ---
+        st.success(f"📌 **TRAMO:** (KM {pk_min}-{pk_max})")
 
-        # --- AQUÍ ESTÁ EL CAMBIO QUE PEDÍAS ---
         st.write(f"**Estos son los km que tiene la carretera para elegir: desde el {pk_min} al {pk_max}**")
         
         pk_val = st.number_input("📍 PK A BUSCAR:", min_value=float(pk_min), max_value=float(pk_max), step=0.1, value=float(pk_min))
@@ -134,6 +122,4 @@ with st.sidebar:
     st.write(f"Valencia: {stats.get('VALENCIA', 0)}")
     st.write(f"Alicante: {stats.get('ALICANTE', 0)}")
     st.write(f"Castellón: {stats.get('CASTELLÓN', 0)}")
-    if st.button("🔄 NUEVA CONSULTA", use_container_width=True):
-        st.session_state.clear()
-        st.rerun()
+    # Botón eliminado como pediste
