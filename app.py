@@ -4,7 +4,7 @@ import os
 from geopy.geocoders import Nominatim
 
 # 1. CONFIGURACIÓN Y ESTILOS
-st.set_page_config(page_title="Buscador Carreteras CV", page_icon="🚔", layout="centered")
+st.set_page_config(page_title="Carreteras Com. Valenciana", page_icon="🚔", layout="centered")
 
 st.markdown("""
     <style>
