@@ -30,16 +30,25 @@ st.markdown("""
         color: #666;
         line-height: 1.6;
     }
+    /* Estilo para el subtitulo */
+    .subtitulo-cv {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #555;
+        margin-top: -20px;
+        margin-bottom: 10px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA (TÍTULO Y ESCUDO PEQUEÑO) ---
+# --- CABECERA (CARRETERAS + COM VALENCIANA + ESCUDO) ---
 col_t, col_e = st.columns([5, 1]) 
 with col_t:
     st.title("🛣️ CARRETERAS")
+    st.markdown('<p class="subtitulo-cv">COM VALENCIANA</p>', unsafe_allow_html=True)
 with col_e:
     if os.path.exists("assets/escudo.png"):
-        st.image("assets/escudo.png", width=50) # Imagen muy pequeña como pediste
+        st.image("assets/escudo.png", width=50)
     else:
         st.write("🚔")
 
@@ -56,7 +65,6 @@ def load_data():
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
-# Aviso de pruebas debajo del título
 st.warning("⚠️ APLICACIÓN EN FASE DE PRUEBAS")
 
 prov_sel = st.selectbox("📍 SELECCIONE PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
@@ -87,7 +95,6 @@ if via_input:
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
             
-            # Se mantiene el tramo completo (Origen a Destino)
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (Longitud: {longitud_total} KM)")
             
         except:
