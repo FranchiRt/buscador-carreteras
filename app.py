@@ -19,7 +19,6 @@ st.markdown("""
         justify-content: center !important;
         margin-top: 10px !important;
     }
-    /* Estilo para la leyenda de privacidad al final */
     .privacidad {
         font-size: 0.8rem;
         color: #666;
@@ -68,13 +67,10 @@ def load_data():
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
-# --- MENSAJE DE PRUEBAS ---
 st.warning("⚠️ APLICACIÓN EN FASE DE PRUEBAS")
 
-# --- PROVINCIA ---
 prov_sel = st.selectbox("📍 SELECCIONE PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
 
-# Límites de Castellón ajustados para A-7
 limites = {
     "VALENCIA": (38.80, 40.00), 
     "ALICANTE": (37.80, 38.79), 
@@ -83,7 +79,6 @@ limites = {
 l_min, l_max = limites[prov_sel]
 df_prov = df_raw[(df_raw['lat'] >= l_min) & (df_raw['lat'] <= l_max)]
 
-# --- CARRETERA ---
 via_raw = st.text_input("🛣️ ESCRIBA CARRETERA (Ej: A-7, CV-310):", placeholder="Escriba aquí...")
 via_input = via_raw.strip().upper() 
 
@@ -100,10 +95,14 @@ if via_input:
                 if not loc: return "N/A"
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
+            
+            # --- LÍNEA MODIFICADA SEGÚN TU PETICIÓN ---
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (KM {pk_min}-{pk_max})")
+            
         except:
             st.info(f"🚩 **RANGO:** {via_input} (KM {pk_min} a {pk_max})")
 
+        st.markdown(f"**Estos son los km que tiene la carretera para elegir:**")
         pk_val = st.number_input("📍 PK A BUSCAR:", min_value=float(pk_min), max_value=float(pk_max), step=0.1, value=float(pk_min))
         
         p_c = puntos.iloc[(puntos['pk'] - pk_val).abs().argsort()[:1]].iloc[0]
