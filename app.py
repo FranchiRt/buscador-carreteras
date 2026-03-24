@@ -33,13 +33,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA CON TÍTULO Y ESCUDO GRANDE (Arriba a la derecha) ---
-col_t, col_e = st.columns([3, 1]) # 3 partes para el título, 1 para el escudo (más grande)
+# --- CABECERA (TÍTULO Y ESCUDO PEQUEÑO) ---
+col_t, col_e = st.columns([5, 1]) 
 with col_t:
     st.title("🛣️ CARRETERAS")
 with col_e:
     if os.path.exists("assets/escudo.png"):
-        st.image("assets/escudo.png", width=120) # Aumentado el ancho de 80 a 120
+        st.image("assets/escudo.png", width=50) # Imagen muy pequeña como pediste
     else:
         st.write("🚔")
 
@@ -52,10 +52,11 @@ def load_data():
         return df
     except: return pd.DataFrame()
 
-# 3. LÓGICA PRINCIPAL (Intacta: Origen, Destino y Longitud)
+# 3. LÓGICA PRINCIPAL
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_v62")
 
+# Aviso de pruebas debajo del título
 st.warning("⚠️ APLICACIÓN EN FASE DE PRUEBAS")
 
 prov_sel = st.selectbox("📍 SELECCIONE PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
@@ -86,7 +87,7 @@ if via_input:
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
             
-            # SE MANTIENE EL TRAMO COMPLETO
+            # Se mantiene el tramo completo (Origen a Destino)
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (Longitud: {longitud_total} KM)")
             
         except:
