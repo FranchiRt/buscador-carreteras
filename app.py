@@ -96,13 +96,15 @@ if via_input:
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
             
-            # --- LÍNEA MODIFICADA SEGÚN TU PETICIÓN ---
+            # Muestra el tramo con el nombre de los pueblos y el rango de KM
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (KM {pk_min}-{pk_max})")
             
         except:
             st.info(f"🚩 **RANGO:** {via_input} (KM {pk_min} a {pk_max})")
 
-        st.markdown(f"**Estos son los km que tiene la carretera para elegir:**")
+        # --- AQUÍ ESTÁ EL CAMBIO QUE PEDÍAS ---
+        st.write(f"**Estos son los km que tiene la carretera para elegir: desde el {pk_min} al {pk_max}**")
+        
         pk_val = st.number_input("📍 PK A BUSCAR:", min_value=float(pk_min), max_value=float(pk_max), step=0.1, value=float(pk_min))
         
         p_c = puntos.iloc[(puntos['pk'] - pk_val).abs().argsort()[:1]].iloc[0]
