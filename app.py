@@ -3,14 +3,22 @@ import pandas as pd
 import os
 from geopy.geocoders import Nominatim
 
-# 1. CONFIGURACIÓN Y ESTILOS
+# 1. CONFIGURACIÓN Y ESTILOS (Aquí he añadido el fondo)
 st.set_page_config(page_title="Buscador Carreteras CV", page_icon="🚔", layout="centered")
 
 st.markdown("""
     <style>
+    /* Fondo de la aplicación */
+    .stApp {
+        background-color: #f0f2f6;
+    }
+    
+    /* Contenedor principal de los inputs */
     div[data-testid="stNumberInput"], div[data-testid="stTextInput"], div[data-testid="stSelectbox"] {
         width: 100% !important;
     }
+    
+    /* Estilo del botón del mapa */
     a[data-testid="stLinkButton"] {
         width: 100% !important;
         height: 50px !important;
@@ -18,21 +26,21 @@ st.markdown("""
         align-items: center !important;
         justify-content: center !important;
         margin-top: 10px !important;
+        background-color: #1E88E5 !important;
+        color: white !important;
     }
+
     .seccion-final {
         text-align: center;
-        margin-top: 30px;
+        margin-top: 50px;
+        padding: 20px;
+        border-top: 1px solid #ccc;
     }
-    .firma-texto {
-        font-weight: bold;
-        font-size: 1.1rem;
-        margin-bottom: 10px;
-    }
-    .privacidad {
-        font-size: 0.8rem;
-        color: #666;
-        border-top: 1px solid #eee;
-        padding-top: 10px;
+
+    .privacidad-firma {
+        font-size: 0.85rem;
+        color: #444;
+        line-height: 1.6;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -93,13 +101,12 @@ if via_input:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- SECCIÓN FINAL SIMPLE ---
+# --- SECCIÓN FINAL: PRIVACIDAD + TU FIRMA ---
 st.markdown("""
     <div class="seccion-final">
-        <div class="firma-texto">✍️ Gómez Dest B</div>
-        <div class="privacidad">
-            🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni 
-            información técnica del usuario.
+        <div class="privacidad-firma">
+            🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni información técnica del usuario. 
+            <br><b>✍️ Gómez Dest B</b>
         </div>
     </div>
 """, unsafe_allow_html=True)
