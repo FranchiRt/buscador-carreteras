@@ -19,11 +19,18 @@ st.markdown("""
         justify-content: center !important;
         margin-top: 10px !important;
     }
+    .firma {
+        text-align: center;
+        font-weight: bold;
+        color: #1E88E5;
+        margin-top: 30px;
+        font-size: 1.1rem;
+    }
     .privacidad {
         font-size: 0.8rem;
         color: #666;
         text-align: center;
-        margin-top: 50px;
+        margin-top: 10px;
         padding: 10px;
         border-top: 1px solid #eee;
     }
@@ -31,30 +38,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 2. FUNCIONES
-def leer_estadisticas():
-    archivo = "estadisticas.txt"
-    default = {"VALENCIA": 0, "ALICANTE": 0, "CASTELLÓN": 0}
-    if not os.path.exists(archivo): return default
-    res = {}
-    try:
-        with open(archivo, "r") as f:
-            for l in f.readlines():
-                if ":" in l:
-                    p, cant = l.strip().split(":")
-                    res[p] = int(cant)
-        for k in default:
-            if k not in res: res[k] = 0
-        return res
-    except: return default
-
-def registrar_consulta(provincia):
-    archivo = "estadisticas.txt"
-    stats = leer_estadisticas()
-    stats[provincia] = stats.get(provincia, 0) + 1
-    with open(archivo, "w") as f:
-        for p, cant in stats.items():
-            f.write(f"{p}:{cant}\n")
-
 @st.cache_data
 def load_data():
     try:
@@ -97,40 +80,26 @@ if via_input:
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or d.get('municipality') or "TM"
             
-            # --- TRAMO CON PUEBLOS Y LONGITUD TOTAL ---
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} (Longitud: {longitud_total} KM)")
             
         except:
             st.info(f"🚩 **RANGO:** {via_input} ({longitud_total} KM totales)")
-
-        # --- LÍNEA DE RANGO ELIMINADA COMO PEDISTE ---
         
         pk_val = st.number_input("📍 PK A BUSCAR:", min_value=float(pk_min), max_value=float(pk_max), step=0.1, value=float(pk_min))
         
         p_c = puntos.iloc[(puntos['pk'] - pk_val).abs().argsort()[:1]].iloc[0]
         st.link_button("👉 IR AL MAPA", f"https://www.google.com/maps?q={p_c['lat']},{p_c['lon']}", use_container_width=True)
-
-        if 'ultima_v' not in st.session_state or st.session_state.ultima_v != via_input:
-            registrar_consulta(prov_sel)
-            st.session_state.ultima_v = via_input
     else:
         if via_input != "":
             st.error(f"No hay datos para '{via_input}' en {prov_sel}.")
 
-# --- LEYENDA DE PRIVACIDAD ---
-st.markdown("""
+# --- FIRMA Y LEYENDA DE PRIVACIDAD ---
+st.markdown(f"""
+    <div class="firma">
+        ✍️ Gómez Dest B
+    </div>
     <div class="privacidad">
-        🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales, 
-        geolocalización del dispositivo, ni información técnica del usuario. 
-        Las estadísticas de consulta son totalmente anónimas y se utilizan solo para 
-        mejorar la base de datos de carreteras.
+        🔒 <b>Privacidad garantizada:</b> Esta aplicación no recopila datos personales ni 
+        información técnica del usuario. Las estadísticas son anónimas.
     </div>
 """, unsafe_allow_html=True)
-
-# HISTÓRICO SIDEBAR
-with st.sidebar:
-    st.header("📊 HISTÓRICO")
-    stats = leer_estadisticas()
-    st.write(f"Valencia: {stats.get('VALENCIA', 0)}")
-    st.write(f"Alicante: {stats.get('ALICANTE', 0)}")
-    st.write(f"Castellón: {stats.get('CASTELLÓN', 0)}")
