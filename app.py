@@ -4,7 +4,7 @@ import os
 from geopy.geocoders import Nominatim
 
 # 1. CONFIGURACIÓN Y ESTILOS
-st.set_page_config(page_title="Carreteras Com. Valenciana", page_icon="🚔", layout="centered")
+st.set_page_config(page_title="Carreteras CV", page_icon="🚔", layout="centered")
 
 st.markdown("""
     <style>
@@ -33,13 +33,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA CON ESCUDO (Arriba a la derecha) ---
-col_t, col_e = st.columns([4, 1])
+# --- CABECERA CON TÍTULO Y ESCUDO GRANDE (Arriba a la derecha) ---
+col_t, col_e = st.columns([3, 1]) # 3 partes para el título, 1 para el escudo (más grande)
 with col_t:
-    st.title("Buscador Carreteras CV")
+    st.title("🛣️ CARRETERAS")
 with col_e:
     if os.path.exists("assets/escudo.png"):
-        st.image("assets/escudo.png", width=80)
+        st.image("assets/escudo.png", width=120) # Aumentado el ancho de 80 a 120
     else:
         st.write("🚔")
 
@@ -68,7 +68,7 @@ limites = {
 l_min, l_max = limites[prov_sel]
 df_prov = df_raw[(df_raw['lat'] >= l_min) & (df_raw['lat'] <= l_max)]
 
-via_raw = st.text_input("🛣️ ESCRIBA CARRETERA (Ej: A-7, CV-310):", placeholder="Escriba aquí...")
+via_raw = st.text_input("ESCRIBA CARRETERA (Ej: A-7, CV-310):", placeholder="Escriba aquí...")
 via_input = via_raw.strip().upper() 
 
 if via_input:
