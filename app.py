@@ -23,7 +23,7 @@ st.markdown("""<style>
 # CABECERA
 st.markdown('<div class="simple-header"><div class="header-title">🛣️ CARRETERAS</div></div>', unsafe_allow_html=True)
 
-# --- GESTIÓN DEL MENSAJE DE BIENVENIDA (SOLO AL INICIO) ---
+# --- BIENVENIDA ---
 if 'bienvenida_activa' not in st.session_state:
     st.session_state.bienvenida_activa = True
 
@@ -34,10 +34,10 @@ if st.session_state.bienvenida_activa:
                 <h3 style="color: #ffd700; margin-top: 0px; font-size: 22px;">🚀 BIENVENIDO A LA VERSIÓN 3.0</h3>
                 <p style="color: #ffffff; font-size: 15px;">Se han implementado las siguientes mejoras de revisión (Marzo 2026):</p>
                 <ul style="color: #cccccc; font-size: 14px; line-height: 1.5;">
-                    <li><b>Ficha de Carretera:</b> Nuevo diseño de alto contraste con titularidad.</li>
-                    <li><b>Geolocalización:</b> Identificación automática de municipios.</li>
-                    <li><b>Tráfico Real:</b> Capa de intensidad circulatoria activa por defecto.</li>
-                    <li><b>Precisión Maps:</b> Enlace directo al punto kilométrico exacto.</li>
+                    <li><b>Ficha de Carretera:</b> Diseño con kilómetros resaltados en dorado.</li>
+                    <li><b>Geolocalización:</b> Identificación de municipios automática.</li>
+                    <li><b>Tráfico Real:</b> Flujo circulatorio activo en el mapa.</li>
+                    <li><b>Visibilidad:</b> PK en negro intenso y negrita para móviles.</li>
                 </ul>
             </div>
         """, unsafe_allow_html=True)
@@ -65,7 +65,7 @@ NOMBRES_OFICIALES = {
     "V-23": "V-23 (Acceso Puerto Sagunto)", "V-30": "V-30 (Circunvalación VLC)"
 }
 
-# --- ENTRADA DE DATOS (SUBE CUANDO SE CIERRA LA BIENVENIDA) ---
+# --- BUSCADOR ---
 if not st.session_state.bienvenida_activa:
     st.markdown('<div class="section-label">📍 DATOS DE LA CONSULTA</div>', unsafe_allow_html=True)
     prov_sel = st.selectbox("PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
@@ -75,6 +75,7 @@ if not st.session_state.bienvenida_activa:
     if via_input:
         puntos = df_raw[df_raw['id_vial'] == via_input].sort_values('pk')
         
+        # FILTROS VALENCIA (SIN TOCAR)
         if prov_sel == "VALENCIA" and not puntos.empty:
             if via_input == "AP-7":
                 puntos = puntos[((puntos['pk'] >= 302) & (puntos['pk'] <= 466)) | 
@@ -98,7 +99,7 @@ if not st.session_state.bienvenida_activa:
                 orig_g, dest_g = "", ""
                 try:
                     for i in range(100):
-                        time.sleep(0.002)
+                        time.sleep(0.001)
                         barra.progress(i + 1)
                         if i == 40 and via_input not in NOMBRES_OFICIALES:
                             li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}")
@@ -111,17 +112,19 @@ if not st.session_state.bienvenida_activa:
                 except: pass
             placeholder_carga.empty()
 
-            # FICHA VISUAL RESALTADA
+            # FICHA TÉCNICA
             nombre_final = NOMBRES_OFICIALES.get(via_input, f"CARRETERA {via_input} ({orig_g} - {dest_g})")
             st.markdown(f"""
                 <div style="background-color: #1e1e1e; padding: 20px; border-radius: 15px; border: 2px solid #ffd700; margin-bottom: 20px;">
-                    <h3 style="color: #ffd700; margin-top: 0px; margin-bottom: 10px; font-size: 26px;">{nombre_final}</h3>
-                    <p style="color: #ffffff; font-size: 18px; margin: 5px 0;"><b>Titular:</b> {titular}</p>
-                    <p style="color: #ffffff; font-size: 18px; margin: 5px 0;"><b>Recorrido:</b> PK {pk_min} a PK {pk_max} ({long_t} KM)</p>
+                    <h3 style="color: #ffd700; margin-top: 0px; margin-bottom: 12px; font-size: 26px; line-height: 1.1;">{nombre_final}</h3>
+                    <p style="color: #ffffff; font-size: 18px; margin: 4px 0;"><b>Titular:</b> {titular}</p>
+                    <p style="color: #ffffff; font-size: 20px; margin: 8px 0;">
+                        <b>Recorrido:</b> PK <span style="color: #ffd700; font-weight: 900;">{pk_min}</span> a PK <span style="color: #ffd700; font-weight: 900;">{pk_max}</span> 
+                        (<span style="color: #ffd700; font-weight: 900;">{long_t} KM</span>)
+                    </p>
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown('<div class="section-label">🎯 Selección de Punto Exacto</div>', unsafe_allow_html=True)
             pk_val = st.number_input("PK seleccionado:", min_value=float(pk_min), max_value=float(pk_max), step=0.1)
             p_c = puntos.iloc[(puntos['pk'] - pk_val).abs().argsort()[:1]].iloc[0]
             
@@ -145,8 +148,10 @@ if not st.session_state.bienvenida_activa:
                     pts.forEach(function(p) {{
                         var icon = L.divIcon({{
                             className: 'label',
-                            html: "<div style='color:#000; font-weight:700; font-size:11px; text-shadow: 1px 1px 0 #fff;'>" + p.pk + "</div>",
-                            iconSize: [25, 15]
+                            // CORRECCIÓN FINAL: NEGRO ABSOLUTO CON BORDE BLANCO REFORZADO
+                            html: "<div style='color:#000000 !important; font-weight:900; font-size:15px; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0px 0px 4px #fff;'>" + p.pk + "</div>",
+                            iconSize: [30, 20],
+                            iconAnchor: [15, 10]
                         }});
                         L.marker([p.lat, p.lon], {{icon: icon}}).addTo(group);
                     }});
@@ -160,36 +165,19 @@ if not st.session_state.bienvenida_activa:
         else:
             st.error(f"Vía {via_input} no localizada.")
 
-    # --- SECCIÓN INFERIOR PERMANENTE ---
+    # --- FOOTER ---
     st.markdown("---")
     with st.expander("🚀 NOVEDADES DE LA VERSIÓN (v3.0)"):
-        st.markdown("""
-            <div style="background-color: #1a1a1a; padding: 15px; border-radius: 10px; border-left: 5px solid #ffd700;">
-                <p style="color: #ffd700; font-weight: bold; margin-bottom: 8px; font-size: 18px;">Revisión Marzo 2026:</p>
-                <ul style="color: #ffffff; font-size: 15px; line-height: 1.6;">
-                    <li><b>🗂️ Nueva Ficha Técnica:</b> Datos de titularidad y recorrido en tarjeta.</li>
-                    <li><b>📡 Geolocalización:</b> Identificación de municipios automática.</li>
-                    <li><b>🚦 Tráfico Real:</b> Visor con flujo circulatorio activo.</li>
-                    <li><b>📍 Pin de Precisión:</b> Marcado exacto en Google Maps.</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
-
+        st.markdown("""<div style="background-color: #1a1a1a; padding: 15px; border-radius: 10px; border-left: 5px solid #ffd700;">
+            <p style="color: #ffffff;">Mejoras de legibilidad en mapa, ficha técnica dorada y sistema de bienvenida.</p>
+        </div>""", unsafe_allow_html=True)
     with st.expander("🔒 PRIVACIDAD Y SEGURIDAD"):
-        st.markdown("""
-            <div style="padding: 10px;">
-                <ul style="color: #cccccc; font-size: 14px;">
-                    <li><b>Sin rastreo de IP:</b> No se registra el origen de las conexiones.</li>
-                    <li><b>Sin guardado de datos:</b> No se almacenan coordenadas ni consultas.</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<p style='color: #cccccc; font-size: 14px;'>Sin rastreo de IP ni guardado de datos.</p>", unsafe_allow_html=True)
 
-    # FOOTER
     col1, col2 = st.columns([1, 4])
     with col1:
         ruta_img = "assets/escudo.png" if os.path.exists("assets/escudo.png") else "escudo.png"
         try: st.image(ruta_img, width=80)
-        except: st.markdown("<h2 style='text-align:right;'>🛡️</h2>", unsafe_allow_html=True)
+        except: st.markdown("🛡️")
     with col2:
         st.markdown("<br>**✍️ Gómez Dest B**", unsafe_allow_html=True)
