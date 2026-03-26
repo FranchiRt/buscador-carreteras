@@ -93,7 +93,8 @@ def load_data():
     except: return pd.DataFrame()
 
 df_raw = load_data()
-geolocator = Nominatim(user_agent="sector_cv_v65")
+# He subido el timeout a 5 aquí para dar más margen global
+geolocator = Nominatim(user_agent="sector_cv_v65", timeout=5)
 
 st.warning("⚠️ APLICACIÓN EN FASE DE PRUEBAS")
 prov_sel = st.selectbox("📍 SELECCIONE PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
@@ -112,16 +113,19 @@ if via_input:
         pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
         longitud_total = round(pk_max - pk_min, 1)
         
+        # --- BLOQUE ACTUALIZADO: ORIGEN Y DESTINO REFORZADO ---
         try:
-            li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}", timeout=3)
-            lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}", timeout=3)
+            li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}")
+            lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}")
             def obtener_ref(loc):
                 if not loc: return "N/A"
                 d = loc.raw.get('address', {})
                 return d.get('town') or d.get('village') or d.get('city') or "TM"
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} ({longitud_total} KM)")
         except:
-            st.info(f"🚩 **RANGO:** {via_input} ({longitud_total} KM)")
+            # Si internet falla o tarda mucho, mostramos los datos del CSV siempre
+            st.info(f"🚩 **VÍA {via_input}:** Desde PK {pk_min} hasta PK {pk_max} ({longitud_total} KM)")
+        # -----------------------------------------------------
         
         intervalo = 1 if longitud_total <= 10 else (2 if longitud_total <= 40 else 5)
         puntos_km = puntos[puntos['pk'] % intervalo == 0].to_dict('records')
