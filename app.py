@@ -7,12 +7,11 @@ import streamlit.components.v1 as components
 # 1. CONFIGURACIÓN Y ESTILOS
 st.set_page_config(page_title="Carreteras CV", page_icon="🚔", layout="centered")
 
-# --- LÓGICA DE MENSAJE DE BIENVENIDA (SOLO UNA VEZ POR SESIÓN) ---
+# --- LÓGICA DE MENSAJE DE BIENVENIDA ---
 if 'visto_anuncio' not in st.session_state:
     st.session_state.visto_anuncio = False
 
 if not st.session_state.visto_anuncio:
-    # Creamos un contenedor visual para el aviso de actualización
     aviso = st.container()
     with aviso:
         st.markdown("""
@@ -25,23 +24,20 @@ if not st.session_state.visto_anuncio:
                 margin-bottom: 25px;
                 box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
             ">
-                <h1 style="color: #ffffff; font-size: 28px; margin-bottom: 10px;">📢 ACTUALIZACIÓN DEL SISTEMA</h1>
-                <p style="color: #ffd700; font-size: 20px; font-weight: bold; margin-bottom: 20px;">
+                <h1 style="color: #ffffff; font-size: 28px; margin-bottom: 10px; font-family: sans-serif;">📢 ACTUALIZACIÓN DEL SISTEMA</h1>
+                <p style="color: #ffd700; font-size: 20px; font-weight: bold; margin-bottom: 20px; font-family: sans-serif;">
                     REV: AÑADIR TRAZADO CON MAPA DE LA VÍA INDICANDO PUNTOS KILOMÉTRICOS Y CORRECCIÓN DE ERRORES MENORES
                 </p>
-                <p style="color: #cccccc; font-size: 14px;">Optimización de carga y mejora visual de mapas v2.0</p>
+                <p style="color: #cccccc; font-size: 14px; font-family: sans-serif;">Optimización de carga y mejora visual de mapas v2.0</p>
             </div>
         """, unsafe_allow_html=True)
         
         if st.button("✅ ENTENDIDO / NO MOSTRAR MÁS", use_container_width=True):
             st.session_state.visto_anuncio = True
-            st.rerun() # Recarga la página para ocultar el mensaje
-    st.stop() # Detiene la ejecución del resto de la app hasta que den a Entendido
+            st.rerun()
+    st.stop()
 
-# ------------------------------------------------------------------
-# EL RESTO DEL CÓDIGO SOLO SE EJECUTA SI YA HAN DADO A "ENTENDIDO"
-# ------------------------------------------------------------------
-
+# --- ESTILOS CSS ---
 st.markdown("""
     <style>
     div[data-testid="stNumberInput"], div[data-testid="stTextInput"], div[data-testid="stSelectbox"] {
@@ -64,20 +60,14 @@ st.markdown("""
         position: relative;
     }
     .seccion-final {
-        margin-top: 50px;
-        padding: 20px;
+        margin-top: 40px;
+        padding: 15px;
         border-top: 1px solid #444;
     }
-    .privacidad-firma {
-        font-size: 1rem;
-        color: #ffffff;
-        line-height: 1.5;
-        text-shadow: 1px 1px 2px #000000;
-    }
-    .firma-destacada {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #ffffff;
+    /* Estilo para que el expander de privacidad no destaque demasiado */
+    .stExpander {
+        border: none !important;
+        background: transparent !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -93,7 +83,6 @@ def load_data():
     except: return pd.DataFrame()
 
 df_raw = load_data()
-# He subido el timeout a 5 aquí para dar más margen global
 geolocator = Nominatim(user_agent="sector_cv_v65", timeout=5)
 
 st.warning("⚠️ APLICACIÓN EN FASE DE PRUEBAS")
@@ -113,7 +102,6 @@ if via_input:
         pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
         longitud_total = round(pk_max - pk_min, 1)
         
-        # --- BLOQUE ACTUALIZADO: ORIGEN Y DESTINO REFORZADO ---
         try:
             li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}")
             lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}")
@@ -123,9 +111,7 @@ if via_input:
                 return d.get('town') or d.get('village') or d.get('city') or "TM"
             st.success(f"📌 **TRAMO:** De {obtener_ref(li)} a {obtener_ref(lf)} ({longitud_total} KM)")
         except:
-            # Si internet falla o tarda mucho, mostramos los datos del CSV siempre
             st.info(f"🚩 **VÍA {via_input}:** Desde PK {pk_min} hasta PK {pk_max} ({longitud_total} KM)")
-        # -----------------------------------------------------
         
         intervalo = 1 if longitud_total <= 10 else (2 if longitud_total <= 40 else 5)
         puntos_km = puntos[puntos['pk'] % intervalo == 0].to_dict('records')
@@ -139,7 +125,7 @@ if via_input:
         <div class="map-container">
             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
             <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-            <div style="position: absolute; top: 12px; right: 12px; z-index: 1000; background: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: bold; font-size: 13px; color: #000000; border: 2px solid #555555; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); letter-spacing: 0.3px;">
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 1000; background: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: sans-serif; font-weight: bold; font-size: 13px; color: #000000; border: 2px solid #555555; box-shadow: 2px 2px 5px rgba(0,0,0,0.3);">
                 📍 Trazado de la vía
             </div>
             <div id="map" style="width: 100%; height: 450px;"></div>
@@ -167,12 +153,21 @@ if via_input:
     else:
         st.error(f"No hay datos para '{via_input}'.")
 
-# PIE DE PÁGINA
+# --- PIE DE PÁGINA CON DESPLEGABLE ---
 st.markdown('<div class="seccion-final">', unsafe_allow_html=True)
-col_escudo, col_texto = st.columns([1, 5])
+col_escudo, col_info = st.columns([1, 5])
+
 with col_escudo:
-    if os.path.exists("assets/escudo.png"): st.image("assets/escudo.png", width=65)
+    if os.path.exists("assets/escudo.png"): st.image("assets/escudo.png", width=60)
     else: st.write("🚔")
-with col_texto:
-    st.markdown("""<div class="privacidad-firma">🔒 <b>Privacidad garantizada.</b><br><span class="firma-destacada">✍️ Gómez Dest B</span></div>""", unsafe_allow_html=True)
+
+with col_info:
+    # Aquí creamos el "botón" desplegable
+    with st.expander("🔒 PRIVACIDAD Y SEGURIDAD"):
+        st.write("""
+            Esta aplicación no utiliza cookies de rastreo ni almacena el historial de búsqueda. 
+            No se registra la dirección IP del usuario ni se recopilan datos de ubicación en tiempo real. 
+            El procesamiento de los datos de la vía se realiza de forma local y efímera en la sesión actual.
+        """)
+    st.markdown("**✍️ Gómez Dest B**")
 st.markdown('</div>', unsafe_allow_html=True)
