@@ -99,7 +99,7 @@ if not st.session_state.bienvenida_activa:
     st.markdown('<div style="color:#104A30; font-weight:900; font-size:24px; margin-top:15px; margin-bottom:10px;">📍 DATOS DE LA CONSULTA</div>', unsafe_allow_html=True)
     
     prov_sel = st.selectbox("PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
-    via_raw = st.text_input("CARRETERA:")
+    via_raw = st.text_input("CARRETERA:", placeholder="Ej: CV-35 o A-7")
     via_input = via_raw.strip().upper()
 
     if via_input:
