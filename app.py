@@ -5,6 +5,14 @@ import time
 import base64
 from geopy.geocoders import Nominatim
 import streamlit.components.v1 as components
+# ==========================================
+# 🛑 INTERRUPTOR DE PAUSA (MODO MANTENIMIENTO)
+# Para PAUSAR la app: quita las almohadillas (#) de las dos líneas de abajo.
+# Para ACTIVAR la app: pon las almohadillas (#) delante.
+# ==========================================
+ st.warning("⚠️ APLICACIÓN PAUSADA TEMPORALMENTE POR EL ADMINISTRADOR")
+ st.stop()
+# ==========================================
 
 # ⚠️ PROTOCOLO DE SEGURIDAD EXCLUSIVO PARA FRAN:
 # PROHIBIDO MODIFICAR SIN ORDEN EXPLÍCITA: 
