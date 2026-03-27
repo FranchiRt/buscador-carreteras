@@ -5,22 +5,13 @@ import time
 import base64
 from geopy.geocoders import Nominatim
 import streamlit.components.v1 as components
-# ==========================================
-# 🛑 INTERRUPTOR DE PAUSA (MODO MANTENIMIENTO)
-# Para PAUSAR la app: quita las almohadillas (#) de las dos líneas de abajo.
-# Para ACTIVAR la app: pon las almohadillas (#) delante.
-# ==========================================
- st.warning("⚠️ APLICACIÓN PAUSADA TEMPORALMENTE POR EL ADMINISTRADOR")
- st.stop()
-# ==========================================
 
 # ⚠️ PROTOCOLO DE SEGURIDAD EXCLUSIVO PARA FRAN:
 # PROHIBIDO MODIFICAR SIN ORDEN EXPLÍCITA: 
 # 1. Motor de búsqueda de PK y lógica de titularidad.
 # 2. Filtros de frontera (Valencia, Alicante, Castellón).
 # 3. Textos de Privacidad y Seguridad.
-# 4. Histórico de Versiones (DESDE V1.0).
-# 5. Base de datos de denominaciones locales.
+# 4. Base de datos de denominaciones locales.
 
 # 1. CONFIGURACIÓN Y ESTILOS
 st.set_page_config(page_title="Carreteras", page_icon="🚔", layout="centered")
@@ -63,46 +54,32 @@ DICCIONARIO_VIAS = {
 }
 
 st.markdown("""<style>
-    .block-container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 2.5rem !important; background-color: #000000; }
+    .block-container { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 3.5rem !important; background-color: #000000; }
     div[data-testid="stNumberInput"], div[data-testid="stTextInput"], div[data-testid="stSelectbox"] { width: 100% !important; }
     .stProgress > div > div > div > div { background-color: #104A30 !important; }
-    .header-left { text-align: left; }
+    .header-left { text-align: left; width: 100%; margin-bottom: 25px; }
     .header-title { color: #ffffff; font-size: 52px; font-weight: 900; line-height: 1.1; margin: 0; border-bottom: 6px solid #104A30; display: inline-block; }
-    .header-subtitle { color: #ffffff; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 4.3px; margin-top: 8px; display: block; white-space: nowrap; }
-    .emergencia-cartel { background-color: #104A30; border-radius: 12px; padding: 12px 15px; border: 2px solid #ffffff; text-align: center; min-width: 220px; display: flex; flex-direction: column; align-items: center; margin-top: 38px; }
-    .cartel-numero { color: #ffffff; font-size: 42px; font-weight: 900; line-height: 1; margin: 0; }
-    .cartel-logo-img { width: 45px; height: auto; }
-    .cartel-slogan { color: #ffff00; font-size: 13px; font-style: italic; font-weight: 800; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 5px; width: 100%; }
-    .version-box { background-color: #1a1a1a; padding: 20px; border-radius: 15px; border: 3px solid #104A30; margin-top: 20px; margin-bottom: 15px; }
+    .header-subtitle { color: #ffffff; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 4.3px; margin-top: 8px; display: block; }
+    .version-box { background-color: #1a1a1a; padding: 20px; border-radius: 15px; border: 3px solid #104A30; margin-top: 10px; margin-bottom: 15px; }
     .antena-animada { font-size: 60px; text-align: center; margin: 10px 0; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+    .firma-container { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 20px; border-top: 1px solid #333; margin-top: 20px; }
 </style>""", unsafe_allow_html=True)
 
-# CABECERA
-c1, c2 = st.columns([2, 1])
-with c1:
-    st.markdown("""<div class="header-left"><div class="header-title">🛣️ CARRETERAS</div><div class="header-subtitle">RED VIARIA COMUNIDAD VALENCIANA</div></div>""", unsafe_allow_html=True)
-    components.html("""
-    <div style="background-color: #1a1a1a; border: 4px solid #fff; border-radius: 10px; height: 130px; display: flex; overflow: hidden; margin-top: 15px;">
-        <div style="width: 100%; display: flex; align-items: center; justify-content: center; padding: 5px; background-image: linear-gradient(rgba(255,255,255,0.08) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.08) 2px, transparent 2px); background-size: 25px 25px;">
-            <div id="pmv-screen" style="color: #FFFF00; font-size: 26px; font-weight: bold; text-align: center; text-transform: uppercase; line-height: 1.1; font-family: 'Courier New', monospace; letter-spacing: 4px;"></div>
-        </div>
-    </div>
-    <script>
-        const msgs = ["SUBSECTOR TRAFICO VALENCIA <br> TEL: 963695899", "SUBSECTOR TRAFICO ALICANTE <br> TEL: 965145100", "SUBSECTOR TRAFICO CASTELLON <br> TEL: 964224600", "EN CARRETERA <br> PRUDENCIA", "URGENCIAS <br> 062"];
-        let i = 0; const el = document.getElementById('pmv-screen');
-        function rotate() { el.innerHTML = msgs[i]; i = (i + 1) % msgs.length; }
-        rotate(); setInterval(rotate, 5000); 
-    </script>""", height=160)
-with c2:
-    img_tag = f'<img src="data:image/png;base64,{logo_base64}" class="cartel-logo-img">' if logo_base64 else '🛡️'
-    st.markdown(f"""<div style="height: 52px;"></div><div class="emergencia-cartel"><div style="color: #fff; font-size: 11px; font-weight: 900;">GUARDIA CIVIL</div><div style="display: flex; align-items: center; gap: 10px; margin: 5px 0;"><div class="cartel-numero">📞062</div>{img_tag}</div><div class="cartel-slogan">Si me necesitas, llámame</div></div>""", unsafe_allow_html=True)
+# CABECERA A LA IZQUIERDA
+st.markdown("""<div class="header-left"><div class="header-title">🛣️ CARRETERAS</div><div class="header-subtitle">RED VIARIA COMUNIDAD VALENCIANA</div></div>""", unsafe_allow_html=True)
 
-# --- BIENVENIDA ---
+# --- BIENVENIDA (SOLO PRUEBAS Y FEEDBACK) ---
 if 'bienvenida_activa' not in st.session_state: st.session_state.bienvenida_activa = True
 if st.session_state.bienvenida_activa:
-    st.markdown("""<div class="version-box"><h3 style="color: #ffffff; background-color: #104A30; padding: 10px; border-radius: 5px; text-align: center;">🚔 VERSIÓN 3.2: MOTOR HÍBRIDO</h3><p style="color: #ffffff; margin-top: 15px;">🚀 Lectura instantánea de tramos oficiales.<br>📡 Nuevo sistema de carga con porcentaje real.<br>🛡️ Protocolo de seguridad y fronteras activo.</p></div>""", unsafe_allow_html=True)
-    if st.button("✅ ACCEDER A LA APLICACIÓN", use_container_width=True):
+    st.markdown("""<div class="version-box">
+        <h3 style="color: #ffffff; background-color: #104A30; padding: 10px; border-radius: 5px; text-align: center;">🚨 APLICACIÓN EN PRUEBAS</h3>
+        <p style="color: #ffffff; margin-top: 15px; text-align: center; font-size: 18px;">
+            Se ruega a los usuarios utilizar esta aplicación para <b>comprobar datos y verificar posibles fallos</b> de trazado, ubicación o denominación de carreteras.<br><br>
+            Su uso activo nos ayudará a detectar errores y mejorar la precisión del sistema.
+        </p>
+    </div>""", unsafe_allow_html=True)
+    if st.button("✅ ACCEDER Y COMPROBAR SISTEMA", use_container_width=True):
         st.session_state.bienvenida_activa = False
         st.rerun()
 
@@ -116,7 +93,7 @@ def load_data():
     except: return pd.DataFrame()
 
 df_raw = load_data()
-geolocator = Nominatim(user_agent="sector_cv_fran_v3", timeout=5)
+geolocator = Nominatim(user_agent="sector_cv_fran_v3", timeout=10)
 
 if not st.session_state.bienvenida_activa:
     st.markdown('<div style="color:#104A30; font-weight:900; font-size:24px; margin-top:15px; margin-bottom:10px;">📍 DATOS DE LA CONSULTA</div>', unsafe_allow_html=True)
@@ -127,9 +104,8 @@ if not st.session_state.bienvenida_activa:
 
     if via_input:
         puntos = df_raw[df_raw['id_vial'] == via_input].sort_values('pk')
-        if puntos.empty:
-            st.error(f"⚠️ LA CARRETERA '{via_input}' NO EXISTE EN LA BASE DE DATOS.")
-        else:
+        
+        if not puntos.empty:
             if prov_sel == "VALENCIA":
                 if via_input == "AP-7": puntos = puntos[((puntos['pk'] >= 302) & (puntos['pk'] <= 466)) | ((puntos['pk'] >= 526) & (puntos['pk'] <= 601))]
                 elif via_input == "N-332": puntos = puntos[puntos['pk'] >= 204.5]
@@ -139,89 +115,80 @@ if not st.session_state.bienvenida_activa:
             elif prov_sel == "ALICANTE": puntos = puntos[puntos['lat'] < 38.751]
             elif prov_sel == "CASTELLÓN": puntos = puntos[puntos['lat'] > 40.051]
 
-            if not puntos.empty:
-                pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
-                long_t = round(pk_max - pk_min, 1)
-                titular = "ESTADO (MITMS)" if via_input.startswith(('A-', 'AP-', 'N-', 'V-')) else "GENERALITAT (GVA)"
+        if puntos.empty:
+            st.error(f"⚠️ LA CARRETERA '{via_input}' NO EXISTE O NO PERTENECE A {prov_sel}.")
+        else:
+            pk_min, pk_max = puntos['pk'].min(), puntos['pk'].max()
+            long_t = round(pk_max - pk_min, 1)
+            titular = "ESTADO (MITMS)" if via_input.startswith(('A-', 'AP-', 'N-', 'V-')) else "GENERALITAT (GVA)"
 
-                nombre_final = ""
-                if via_input in DICCIONARIO_VIAS: nombre_final = DICCIONARIO_VIAS[via_input]
-                else:
-                    placeholder_carga = st.empty()
-                    with placeholder_carga.container():
-                        st.markdown('<div class="antena-animada">📡</div>', unsafe_allow_html=True)
-                        barra = st.progress(0); txt_perc = st.empty()
-                        for i in range(100):
-                            time.sleep(0.01); progreso = i + 1
-                            barra.progress(progreso)
-                            txt_perc.markdown(f"<p style='text-align:center; color:#fff;'>CONECTANDO... {progreso}%</p>", unsafe_allow_html=True)
-                            if i == 50:
-                                try:
-                                    li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}")
-                                    lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}")
-                                    def get_ref(loc):
-                                        d = loc.raw.get('address', {}) if loc else {}
-                                        return d.get('town') or d.get('village') or d.get('city') or "TM"
-                                    nombre_final = f"VÍA {via_input} ({get_ref(li)} - {get_ref(lf)})"
-                                except: nombre_final = f"VÍA {via_input} (PK {pk_min} a PK {pk_max})"
-                    placeholder_carga.empty()
+            nombre_final = ""
+            if via_input in DICCIONARIO_VIAS: nombre_final = DICCIONARIO_VIAS[via_input]
+            else:
+                placeholder_carga = st.empty()
+                with placeholder_carga.container():
+                    st.markdown('<div class="antena-animada">📡</div>', unsafe_allow_html=True)
+                    barra = st.progress(0); txt_perc = st.empty()
+                    for i in range(100):
+                        time.sleep(0.01); progreso = i + 1
+                        barra.progress(progreso)
+                        txt_perc.markdown(f"<p style='text-align:center; color:#fff;'>CONECTANDO... {progreso}%</p>", unsafe_allow_html=True)
+                        if i == 50:
+                            try:
+                                li = geolocator.reverse(f"{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}")
+                                lf = geolocator.reverse(f"{puntos.iloc[-1]['lat']}, {puntos.iloc[-1]['lon']}")
+                                def get_ref(loc):
+                                    d = loc.raw.get('address', {}) if loc else {}
+                                    return d.get('town') or d.get('village') or d.get('city') or "TM"
+                                nombre_final = f"VÍA {via_input} ({get_ref(li)} - {get_ref(lf)})"
+                            except: nombre_final = f"VÍA {via_input} (PK {pk_min} a PK {pk_max})"
+                placeholder_carga.empty()
 
-                st.markdown(f"""<div style="background-color: #1a1a1a; padding: 20px; border-radius: 15px; border: 3px solid #104A30; margin-bottom: 20px;"><h3 style="color: #ffffff; background-color: #104A30; padding: 10px; border-radius: 5px; text-align: center;">{nombre_final}</h3><p style="color: #ffffff;"><b>Titular:</b> {titular}</p><p style="color: #ffffff; font-size: 20px;"><b>Recorrido:</b> PK <span style="color: #AA151B; font-weight: 900;">{pk_min}</span> a PK <span style="color: #AA151B; font-weight: 900;">{pk_max}</span> (<span style="color: #AA151B; font-weight: 900;">{long_t} KM</span>)</p></div>""", unsafe_allow_html=True)
-                
-                if long_t <= 40: intervalo = 1
-                elif 40 < long_t <= 80: intervalo = 2
-                else: intervalo = 5
-                puntos_km = puntos[puntos['pk'] % intervalo == 0].to_dict('records')
-                
-                st.markdown("""<div style="background-color: #104A30; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: 700;">👉 PULSA SOBRE EL PK PARA IR A GOOGLE MAPS</div>""", unsafe_allow_html=True)
-                
-                # --- MAPA CON HITOS Y ENLACE CORREGIDO ---
-                mapa_html = f"""
-                <div style="border-radius: 10px; overflow: hidden; border: 2px solid #104A30;">
-                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                <div id="map" style="width: 100%; height: 450px;"></div>
-                <script>
-                var traf = L.tileLayer('https://{{s}}.google.com/vt/lyrs=m,traffic&x={{x}}&y={{y}}&z={{z}}', {{subdomains:['mt0','mt1','mt2','mt3']}});
-                var map = L.map('map', {{center: [{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}], zoom: 12, layers: [traf]}});
-                var pts = {puntos_km};
-                var group = L.featureGroup();
-                pts.forEach(function(p) {{
-                    var hitoHtml = "<div style='background: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px; text-align: center; min-width: 35px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); font-family: Arial, sans-serif;'><div style='font-size: 8px; font-weight: bold; border-bottom: 1px solid black; margin-bottom: 1px;'>{via_input}</div><div style='color: black; font-weight: 900; font-size: 16px;'>" + p.pk + "</div></div>";
-                    var marker = L.marker([p.lat, p.lon], {{
-                        icon: L.divIcon({{
-                            className: 'custom-hito',
-                            html: hitoHtml,
-                            iconSize: [45, 40],
-                            iconAnchor: [22, 20]
-                        }})
-                    }}).addTo(group);
-                    marker.on('click', function() {{ 
-                        var url = "https://www.google.com/maps/search/?api=1&query=" + p.lat + "," + p.lon;
-                        window.open(url, "_blank"); 
-                    }});
+            st.markdown(f"""<div style="background-color: #1a1a1a; padding: 20px; border-radius: 15px; border: 3px solid #104A30; margin-bottom: 20px;"><h3 style="color: #ffffff; background-color: #104A30; padding: 10px; border-radius: 5px; text-align: center;">{nombre_final}</h3><p style="color: #ffffff;"><b>Titular:</b> {titular}</p><p style="color: #ffffff; font-size: 20px;"><b>Recorrido:</b> PK <span style="color: #AA151B; font-weight: 900;">{pk_min}</span> a PK <span style="color: #AA151B; font-weight: 900;">{pk_max}</span> (<span style="color: #AA151B; font-weight: 900;">{long_t} KM</span>)</p></div>""", unsafe_allow_html=True)
+            
+            puntos_km = puntos[puntos['pk'] % (1 if long_t <= 40 else 2 if long_t <= 80 else 5) == 0].to_dict('records')
+            
+            st.markdown("""<div style="background-color: #104A30; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: 700;">👉 PULSA SOBRE EL PK PARA IR A GOOGLE MAPS</div>""", unsafe_allow_html=True)
+            
+            # --- MAPA CON HITO DETALLADO RESTAURADO ---
+            mapa_html = f"""
+            <div style="border-radius: 10px; overflow: hidden; border: 2px solid #104A30;">
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <div id="map" style="width: 100%; height: 450px;"></div>
+            <script>
+            var map = L.map('map', {{center: [{puntos.iloc[0]['lat']}, {puntos.iloc[0]['lon']}], zoom: 12}});
+            L.tileLayer('https://{{s}}.google.com/vt/lyrs=m,traffic&x={{x}}&y={{y}}&z={{z}}', {{subdomains:['mt0','mt1','mt2','mt3']}}).addTo(map);
+            var pts = {puntos_km};
+            var group = L.featureGroup();
+            pts.forEach(function(p) {{
+                var hitoHtml = "<div style='background: white; border: 2px solid black; border-radius: 4px; padding: 2px 6px; text-align: center; min-width: 35px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); font-family: Arial, sans-serif;'><div style='font-size: 8px; font-weight: bold; border-bottom: 1px solid black; margin-bottom: 1px;'>{via_input}</div><div style='color: black; font-weight: 900; font-size: 16px;'>" + p.pk + "</div></div>";
+                var marker = L.marker([p.lat, p.lon], {{
+                    icon: L.divIcon({{
+                        className: 'custom-hito',
+                        html: hitoHtml,
+                        iconSize: [45, 40],
+                        iconAnchor: [22, 20]
+                    }})
+                }}).addTo(group);
+                marker.on('click', function() {{ 
+                    window.open("https://www.google.com/maps/search/?api=1&query=" + p.lat + "," + p.lon, "_blank"); 
                 }});
-                group.addTo(map);
-                map.fitBounds(group.getBounds());
-                </script>
-                </div>"""
-                components.html(mapa_html, height=470)
+            }});
+            group.addTo(map);
+            map.fitBounds(group.getBounds());
+            </script>
+            </div>"""
+            components.html(mapa_html, height=470)
 
     st.markdown("---")
     with st.expander("🛡️ PRIVACIDAD Y SEGURIDAD DE DATOS"):
         st.write("Esta aplicación ha sido desarrollada bajo estrictos estándares de seguridad de la información. No se recopilan datos personales. Las peticiones de geolocalización se procesan de forma efímera para determinar trazados de vías.")
     
-    with st.expander("🕒 HISTÓRICO DE VERSIONES"):
-        st.markdown("""
-        * **v3.2:** Motor híbrido, regla dinámica de PK (1, 2, 5 km), mejora visual de fuentes e hitos kilométricos reales.
-        * **v3.1:** Rediseño de PMV, cartel de emergencias 062 y firma con logo.
-        * **v3.0:** Seguridad perimetral por coordenadas y filtros de fronteras provinciales.
-        * **v2.7:** Implementación de geolocalización inversa para nombres de municipios.
-        * **v2.6:** Integración de Google Traffic y sistema de capas Leaflet.
-        * **v2.5:** Primera base de datos dinámica de PK y optimización de carga.
-        * **v1.0:** Estructura inicial de búsqueda de carreteras por denominación.
-        """)
-    
-    col_f1, col_f2 = st.columns([0.1, 0.9])
-    with col_f1: st.markdown(img_tag, unsafe_allow_html=True)
-    with col_f2: st.markdown("<b style='color:#E0E0E0; line-height: 45px;'>✍️ Gómez Dest B</b>", unsafe_allow_html=True)
+    firma_html = f'<div class="firma-container">'
+    if logo_base64:
+        firma_html += f'<img src="data:image/png;base64,{logo_base64}" style="width:40px; height:auto;">'
+    else:
+        firma_html += '<span style="font-size:24px;">🚔</span>'
+    firma_html += '<b style="color:#E0E0E0; font-size:16px; margin-left:10px;">✍️ Gómez Dest B</b></div>'
+    st.markdown(firma_html, unsafe_allow_html=True)
