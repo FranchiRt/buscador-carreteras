@@ -94,14 +94,18 @@ def load_data():
 
 df_raw = load_data()
 geolocator = Nominatim(user_agent="sector_cv_fran_v3", timeout=10)
-
 if not st.session_state.bienvenida_activa:
     st.markdown('<div style="color:#104A30; font-weight:900; font-size:24px; margin-top:15px; margin-bottom:10px;">📍 DATOS DE LA CONSULTA</div>', unsafe_allow_html=True)
     
     prov_sel = st.selectbox("PROVINCIA:", ["VALENCIA", "ALICANTE", "CASTELLÓN"])
+    
+    # Buscador de carretera
     via_raw = st.text_input("CARRETERA:", placeholder="Ej: CV-35 o A-7")
+    
+    # 📝 AQUÍ ESTÁ EL AVISO QUE HEMOS ACORDADO:
+    st.caption("⚠️ **CV-XXXX :** Trazado en mapa no preciso por posibles modificaciones urbanas.")
+    
     via_input = via_raw.strip().upper()
-
     if via_input:
         puntos = df_raw[df_raw['id_vial'] == via_input].sort_values('pk')
         
